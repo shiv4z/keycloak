@@ -1,0 +1,5 @@
+# Created at 2025-05-02T12:33:57.811
+Boot Manifest-JAR contains absolute paths in classpath 'D:\DASHBOARD-1\Microservices3.0\spring-cloud-gateway-keycloak-new\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+

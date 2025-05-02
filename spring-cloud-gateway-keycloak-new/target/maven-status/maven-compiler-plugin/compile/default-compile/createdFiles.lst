@@ -1,0 +1,6 @@
+in\gov\egs\keycloak\CustomRoleAuthenticator.class
+in\gov\egs\SpringCloudApiGatewayApplication.class
+in\gov\egs\controller\DebugAuthAdvice.class
+in\gov\egs\config\WebSecurityConfiguration.class
+in\gov\egs\keycloak\CustomRoleAuthenticatorFactory.class
+in\gov\egs\controller\AuthController.class

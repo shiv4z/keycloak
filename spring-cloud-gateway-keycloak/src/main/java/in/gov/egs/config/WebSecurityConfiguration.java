@@ -18,50 +18,64 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
+import in.gov.egs.pojo.RouteRole;
+import in.gov.egs.service.RouteRoleService;
 import reactor.core.publisher.Mono;
-		
+
 @Configuration
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 public class WebSecurityConfiguration {
 
-    @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-        return http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchange -> exchange
-                        .pathMatchers("/eureka/**").permitAll()
-                        .pathMatchers("/rest-api/products/**").hasRole("admin")
-                        .pathMatchers("/rest-api/fruits/**").hasRole("user")
-                        .pathMatchers("/rest-api/states/**").hasRole("state")
-                        .pathMatchers("/rest-api/prechecker/**").hasRole("prechecker")
-                        .pathMatchers("/rest-api/reviewer/**").hasRole("reviewer")
-                        .pathMatchers("/rest-api/mopr/**").hasRole("mopr")
-                        .pathMatchers("/rest-api/cec/**").hasRole("cec")
-                        .anyExchange().authenticated()
-                )
-                .oauth2ResourceServer(oauth2 ->
-                        oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(grantedAuthoritiesExtractor()))
-                )
-                .build();
-    }
+	@Bean
+	public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, RouteRoleService roleService) {
 
-    private Converter<Jwt, Mono<AbstractAuthenticationToken>> grantedAuthoritiesExtractor() {
-        JwtGrantedAuthoritiesConverter scopeConverter = new JwtGrantedAuthoritiesConverter();
-        scopeConverter.setAuthorityPrefix("SCOPE_");
+		ServerHttpSecurity.AuthorizeExchangeSpec exchange = http.csrf(ServerHttpSecurity.CsrfSpec::disable)
+				.authorizeExchange();
 
-        return jwt -> {
-            List<GrantedAuthority> authorities = new ArrayList<>(scopeConverter.convert(jwt));
+		exchange.pathMatchers("/eureka/**").permitAll();
+		exchange.pathMatchers("/actuator/**").permitAll();
+		exchange.pathMatchers("/health/**").permitAll();
+		exchange.pathMatchers("/auth/**").permitAll();
+		List<RouteRole> mappings = roleService.getRouteRoles();
+		for (RouteRole rr : mappings) {
+			exchange.pathMatchers(rr.getPath()).hasRole(rr.getRole());
+		}
 
-            Map<String, Object> realmAccess = jwt.getClaim("realm_access");
-            if (realmAccess != null && realmAccess.containsKey("roles")) {
-                List<String> roles = (List<String>) realmAccess.get("roles");
-                for (String role : roles) {
-                    authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
-                }
-            }
+		exchange.anyExchange().authenticated();
 
-            return Mono.just(new JwtAuthenticationToken(jwt, authorities));
-        };
-    }
+		return http
+				.oauth2ResourceServer(
+						oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(grantedAuthoritiesExtractor())))
+				.build();
+	}
+
+	private Converter<Jwt, Mono<AbstractAuthenticationToken>> grantedAuthoritiesExtractor() {
+		JwtGrantedAuthoritiesConverter scopeConverter = new JwtGrantedAuthoritiesConverter();
+		scopeConverter.setAuthorityPrefix("SCOPE_");
+
+		return jwt -> {
+			List<GrantedAuthority> authorities = new ArrayList<>(scopeConverter.convert(jwt));
+
+			Map<String, Object> realmAccess = jwt.getClaim("realm_access");
+			if (realmAccess != null && realmAccess.containsKey("roles")) {
+				Object rolesObj = realmAccess.get("roles");
+				if (rolesObj instanceof List<?>) {
+					for (Object roleObj : (List<?>) rolesObj) {
+						if (roleObj instanceof String role) {
+							authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
+						}
+					}
+				}
+			}
+
+			String employeeType = jwt.getClaimAsString("employeeType");
+			if (employeeType != null && !employeeType.isEmpty()) {
+				authorities.add(new SimpleGrantedAuthority("ROLE_" + employeeType)); 
+			}
+
+			return Mono.just(new JwtAuthenticationToken(jwt, authorities));
+		};
+	}
+
 }

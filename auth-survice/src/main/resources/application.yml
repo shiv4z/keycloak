@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: auth-service
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    password: postgres
+    username: postgres
+    url: jdbc:postgresql://localhost:5432/postgres
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/rest-api
+server:
+  port: 9091
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    instanceId: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+      
+#keycloak:
+#  token-uri: http://localhost:8080/realms/rest-api/protocol/openid-connect/token
+#  client-id: keycloak-rest
+#  client-secret: nkvrL7X7wRAU8JtRRGhIcOVQHVXUx4hQ
+#  redirect-uri: http://localhost:9090/auth/callback
+
+
+keycloak:
+  token-uri: http://localhost:8080/realms/rest-api/protocol/openid-connect/token
+  redirect-uri: http://localhost:9090/auth/callback
+  logout-uri: http://localhost:8080/realms/rest-api/protocol/openid-connect/logout
+  post-logout-redirect-uri: http://localhost:9090/logout-success  
+  clients:
+    client-a:
+      client-id: keycloak-rest
+      client-secret: nkvrL7X7wRAU8JtRRGhIcOVQHVXUx4hQ
+    client-b:
+      client-id: keycloak-rest-app
+      client-secret: gg2Ly8FEYr8updAnoeUf2HC4ikFtLReG
+    

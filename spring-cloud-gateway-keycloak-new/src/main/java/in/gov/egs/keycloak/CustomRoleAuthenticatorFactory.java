@@ -12,7 +12,6 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.provider.ProviderConfigProperty;
 
 
-
 public class CustomRoleAuthenticatorFactory implements ConfigurableAuthenticatorFactory {
 
     public static final String PROVIDER_ID = "custom-role-authenticator";

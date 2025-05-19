@@ -14,7 +14,9 @@ import org.keycloak.protocol.oidc.mappers.AbstractOIDCProtocolMapper;
 import org.keycloak.protocol.oidc.mappers.OIDCAccessTokenMapper;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.representations.AccessToken;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CustomRoleProtocolMapper extends AbstractOIDCProtocolMapper implements OIDCAccessTokenMapper {
 
     public static final String PROVIDER_ID = "custom-role-protocol-mapper";

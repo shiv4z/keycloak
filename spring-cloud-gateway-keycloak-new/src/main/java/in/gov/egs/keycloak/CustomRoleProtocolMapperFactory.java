@@ -7,6 +7,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.protocol.ProtocolMapper;
 import org.keycloak.provider.ProviderConfigProperty;
+import org.springframework.stereotype.Component;
 
 public class CustomRoleProtocolMapperFactory implements ProtocolMapper {
 	public static final String PROVIDER_ID = "custom-role-protocol-mapper";

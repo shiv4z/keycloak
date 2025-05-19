@@ -1,5 +1,7 @@
 package in.gov.egs.keycloak;
 
+import java.util.List;
+
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.models.KeycloakSession;
@@ -7,7 +9,6 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
 
-import java.util.List;
 
 public class CustomRoleAuthenticator implements Authenticator {
 

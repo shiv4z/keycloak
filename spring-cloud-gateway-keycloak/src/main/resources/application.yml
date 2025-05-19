@@ -1,4 +1,8 @@
 spring:
+  datasource:
+    password: postgres
+    username: postgres
+    url: jdbc:postgresql://localhost:5432/postgres
   security:
     oauth2:
       resourceserver:
@@ -20,6 +24,11 @@ spring:
             - Path=/rest-api/**
           filters:
             - StripPrefix=1
+            
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/**   
 
 
 server:
@@ -38,3 +47,6 @@ logging:
     org:
       springframework:
         security: DEBUG
+        
+        
+        
